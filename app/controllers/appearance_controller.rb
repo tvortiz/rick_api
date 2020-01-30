@@ -3,7 +3,7 @@ class AppearanceController < ActionController::API
 
 
 
-	#no modo verbose, o servidor imprime informações extras junto com o "ruby server"
+	# No modo verbose, o servidor imprime informações no console junto com o "ruby server"
 	$verbose = true
 
 
@@ -16,13 +16,26 @@ class AppearanceController < ActionController::API
 		# pega o parâmetro ID da requisição
 		id = params[:id]
 
-		print "\nRequisição feita! ID requisitado: ", id, "\n" if $verbose
+		# verifica se ID é um número
+		if !id.match(/^(\d)+$/)
+			render status: :bad_request
+			return
+		end
+
+		print "\nRequisição feita! ID requisitado: ", id.class, "\n" if $verbose
 
 
 
 		# localiza a aparição do char
-		ap = Appearance.find(id) # Appearance está ainda é STUB !!!
-		air_date = ap.air_date
+		ap = Appearance.find(id)
+
+		# verifica se o personagem foi encontrado
+		if ap.char_id == 0
+			render status: :not_found
+			return
+		else
+			air_date = ap.air_date
+		end
 
 		print "A primeira aparição do char foi em: ", air_date, "\n\n" if $verbose
 
@@ -34,13 +47,6 @@ class AppearanceController < ActionController::API
 			#format.js
 		end
 
-
-		# PARA USO FUTURO
-    	#render status: 500
-		#render status: :bad_request
-		#render status: :not_found
-		#render status: :request_timeout
-		#render status: :too_many_requests
 
   	end
 
